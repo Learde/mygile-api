@@ -9,10 +9,10 @@ export class APIError extends Error {
     }
 
     static UnauthorizedError() {
-        return new ApiError(401, "Пользователь не авторизован");
+        return new APIError(401, "Пользователь не авторизован");
     }
 
     static BadRequest(message, errors = []) {
-        return new ApiError(400, message, errors);
+        return new APIError(400, message, errors);
     }
 }

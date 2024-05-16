@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import { UserModel } from "../models/UserModel.js";
 import { UserDTO } from "../dtos/UserDTO.js";
 import { APIError } from "../exceptions/APIError.js";
+import { getRandomAvatarColor } from "../utils/avatarColors.js";
 
 import { mailService } from "./mailService.js";
 import { tokenService } from "./tokenService.js";
@@ -24,11 +25,12 @@ class UserService {
             password: hashPassword,
             activationLink,
             role: "USER",
+            avatarColor: getRandomAvatarColor(),
         });
-        await mailService.sendActivationMail(
-            email,
-            `${process.env.API_URL}/api/activate/${activationLink}`,
-        );
+        // await mailService.sendActivationMail(
+        //     email,
+        //     `${process.env.API_URL}/api/activate/${activationLink}`,
+        // );
 
         const userDto = new UserDTO(user);
         const tokens = tokenService.generateTokens({ ...userDto });
@@ -84,7 +86,12 @@ class UserService {
         return { ...tokens, user: userDto };
     }
 
-    async getAllUsers() {
+    async getById(id) {
+        const user = await UserModel.findById(id);
+        return user;
+    }
+
+    async getAll() {
         const users = await UserModel.find();
         return users;
     }
