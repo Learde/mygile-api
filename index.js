@@ -21,6 +21,7 @@ app.use(
 );
 app.use("/api", router);
 app.use(errorMiddleware);
+app.use(express.static("media"));
 
 const start = async () => {
     try {

@@ -8,6 +8,7 @@ import { getRandomAvatarColor } from "../utils/avatarColors.js";
 
 import { mailService } from "./mailService.js";
 import { tokenService } from "./tokenService.js";
+import { fileService } from "./fileService.js";
 
 class UserService {
     async registration(email, password) {
@@ -94,6 +95,14 @@ class UserService {
     async getAll() {
         const users = await UserModel.find();
         return users;
+    }
+
+    async edit(user) {
+        const editedUser = await UserModel.findByIdAndUpdate(user._id, user, {
+            new: true,
+        });
+
+        return editedUser;
     }
 }
 

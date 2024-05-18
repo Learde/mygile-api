@@ -1,9 +1,11 @@
 import express from "express";
+import multer from "multer";
 import { body } from "express-validator";
+import { extname } from "path";
 
 import { userController } from "../controllers/userController.js";
 import { globalRoleController } from "../controllers/globalRoleController.js";
-import { initController} from "../controllers/initController.js";
+import { initController } from "../controllers/initController.js";
 
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 
@@ -31,6 +33,7 @@ router.get("/auth/refresh", userController.refresh);
 // users
 router.get("/users", authMiddleware, userController.getUsers);
 router.get("/users/:id", authMiddleware, userController.getUser);
+router.put("/users/:id", authMiddleware, userController.editUser);
 
 // roles
 // router.post("/roles", globalRoleController.add);
@@ -38,5 +41,21 @@ router.get("/users/:id", authMiddleware, userController.getUser);
 
 // init
 router.get("/init", authMiddleware, initController.init);
+
+// media
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, "media/");
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + extname(file.originalname));
+    },
+});
+
+const upload = multer({ storage: storage });
+
+router.post("/upload", upload.single("file"), function (req, res) {
+    res.send(req.file.filename);
+});
 
 export { router };

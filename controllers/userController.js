@@ -91,6 +91,15 @@ class UserController {
             next(e);
         }
     }
+
+    async editUser(req, res, next) {
+        const user = await userService.edit(req.body);
+
+        user.password = undefined;
+        user.activationLink = undefined;
+
+        return res.json(user);
+    }
 }
 
 export const userController = new UserController();
