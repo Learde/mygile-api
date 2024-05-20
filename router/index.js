@@ -5,6 +5,8 @@ import { extname } from "path";
 
 import { userController } from "../controllers/userController.js";
 import { globalRoleController } from "../controllers/globalRoleController.js";
+import { companyRoleController } from "../controllers/companyRoleController.js";
+import { companyController } from "../controllers/companyController.js";
 import { initController } from "../controllers/initController.js";
 
 import { authMiddleware } from "../middlewares/authMiddleware.js";
@@ -39,8 +41,22 @@ router.put("/users/:id", authMiddleware, userController.editUser);
 // router.post("/roles", globalRoleController.add);
 // router.get("/roles", globalRoleController.getRoles);
 
+// company roles
+// router.post("/company-roles", companyRoleController.add);
+router.get("/company-roles", authMiddleware, companyRoleController.getRoles);
+
 // init
 router.get("/init", authMiddleware, initController.init);
+
+// company 
+router.post("/companies", authMiddleware, companyController.add);
+router.get("/companies", authMiddleware, companyController.getUserCompanies);
+router.get("/companies/:id", authMiddleware, companyController.getCompany);
+router.put("/companies/:id", authMiddleware, companyController.editCompany);
+router.delete("/companies/:id", authMiddleware, companyController.deleteCompany);
+router.post("/companies/add/user", authMiddleware, companyController.addUserToCompany);
+router.delete("/companies/delete/user", authMiddleware, companyController.deleteUserFromCompany);
+router.put("/companies/update/user", authMiddleware, companyController.updateUserCompanyRole);
 
 // media
 const storage = multer.diskStorage({
