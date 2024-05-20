@@ -29,14 +29,34 @@ class CompanyService {
                 (userCompany) => userCompany.companyId,
             );
 
-            const query = { _id: { $in: companyIds } };
+            const matchStage = { _id: { $in: companyIds } };
             if (title) {
-                query.title = { $regex: title, $options: "i" };
+                matchStage.title = { $regex: title, $options: "i" };
             }
 
-            const companies = CompanyModel.find(query);
+            const companiesWithMembersCount = await CompanyModel.aggregate([
+                { $match: matchStage },
+                {
+                    $lookup: {
+                        from: "usercompanies",
+                        localField: "_id",
+                        foreignField: "companyId",
+                        as: "members",
+                    },
+                },
+                {
+                    $addFields: {
+                        membersCount: { $size: "$members" },
+                    },
+                },
+                {
+                    $project: {
+                        members: 0,
+                    },
+                },
+            ]);
 
-            return companies;
+            return companiesWithMembersCount;
         } catch {
             throw APIError.BadRequest(
                 "Ошибка при получении компаний пользователя",
@@ -61,13 +81,17 @@ class CompanyService {
 
         console.log(membersCompany);
 
-        const members = await Promise.all(membersCompany.map(async (memberCompany) => {
-            const user = await UserModel.findById(memberCompany.userId).select("-password -activationLink");
-            return {
-                role: memberCompany.role,
-                user,
-            };
-        }));
+        const members = await Promise.all(
+            membersCompany.map(async (memberCompany) => {
+                const user = await UserModel.findById(
+                    memberCompany.userId,
+                ).select("-password -activationLink");
+                return {
+                    role: memberCompany.role,
+                    user,
+                };
+            }),
+        );
 
         console.log(members);
 
