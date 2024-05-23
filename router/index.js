@@ -8,8 +8,10 @@ import { globalRoleController } from "../controllers/globalRoleController.js";
 import { companyRoleController } from "../controllers/companyRoleController.js";
 import { companyController } from "../controllers/companyController.js";
 import { initController } from "../controllers/initController.js";
+import { boardController } from "../controllers/boardController.js";
 
 import { authMiddleware } from "../middlewares/authMiddleware.js";
+import { companyBoardMiddleware } from "../middlewares/companyBoardMiddleware.js";
 
 const router = express.Router();
 
@@ -57,6 +59,13 @@ router.delete("/companies/:id", authMiddleware, companyController.deleteCompany)
 router.post("/companies/add/user", authMiddleware, companyController.addUserToCompany);
 router.delete("/companies/delete/user", authMiddleware, companyController.deleteUserFromCompany);
 router.put("/companies/update/user", authMiddleware, companyController.updateUserCompanyRole);
+
+// board
+router.post("/companies/:companyId/boards", authMiddleware, boardController.add);
+router.get("/companies/:companyId/boards", authMiddleware, boardController.getCompanyBoards);
+router.get("/boards/:id", authMiddleware, companyBoardMiddleware, boardController.getById);
+router.put("/boards/:id", authMiddleware, companyBoardMiddleware, boardController.edit);
+router.delete("/boards/:id", authMiddleware, companyBoardMiddleware, boardController.delete);
 
 // media
 const storage = multer.diskStorage({

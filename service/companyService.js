@@ -79,8 +79,6 @@ class CompanyService {
             companyId: id,
         });
 
-        console.log(membersCompany);
-
         const members = await Promise.all(
             membersCompany.map(async (memberCompany) => {
                 const user = await UserModel.findById(
@@ -92,8 +90,6 @@ class CompanyService {
                 };
             }),
         );
-
-        console.log(members);
 
         return {
             _id: company._id,
