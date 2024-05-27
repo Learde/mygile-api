@@ -7,7 +7,10 @@ export const companyBoardMiddleware = async function (req, res, next) {
         const user = req.user;
         const boardId = req.params.id;
 
+        console.log(boardId, user);
+
         const board = await BoardModel.findById(boardId);
+
         const companyId = board.companyId;
         
         const userCompany = await UserCompanyModel.findOne({

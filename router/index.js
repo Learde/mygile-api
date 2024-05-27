@@ -50,22 +50,115 @@ router.get("/company-roles", authMiddleware, companyRoleController.getRoles);
 // init
 router.get("/init", authMiddleware, initController.init);
 
-// company 
+// company
 router.post("/companies", authMiddleware, companyController.add);
 router.get("/companies", authMiddleware, companyController.getUserCompanies);
 router.get("/companies/:id", authMiddleware, companyController.getCompany);
 router.put("/companies/:id", authMiddleware, companyController.editCompany);
-router.delete("/companies/:id", authMiddleware, companyController.deleteCompany);
-router.post("/companies/add/user", authMiddleware, companyController.addUserToCompany);
-router.delete("/companies/delete/user", authMiddleware, companyController.deleteUserFromCompany);
-router.put("/companies/update/user", authMiddleware, companyController.updateUserCompanyRole);
+router.delete(
+    "/companies/:id",
+    authMiddleware,
+    companyController.deleteCompany,
+);
+router.post(
+    "/companies/add/user",
+    authMiddleware,
+    companyController.addUserToCompany,
+);
+router.delete(
+    "/companies/delete/user",
+    authMiddleware,
+    companyController.deleteUserFromCompany,
+);
+router.put(
+    "/companies/update/user",
+    authMiddleware,
+    companyController.updateUserCompanyRole,
+);
 
 // board
-router.post("/companies/:companyId/boards", authMiddleware, boardController.add);
-router.get("/companies/:companyId/boards", authMiddleware, boardController.getCompanyBoards);
-router.get("/boards/:id", authMiddleware, companyBoardMiddleware, boardController.getById);
-router.put("/boards/:id", authMiddleware, companyBoardMiddleware, boardController.edit);
-router.delete("/boards/:id", authMiddleware, companyBoardMiddleware, boardController.delete);
+router.post(
+    "/companies/:companyId/boards",
+    authMiddleware,
+    boardController.add,
+);
+router.get(
+    "/companies/:companyId/boards",
+    authMiddleware,
+    boardController.getCompanyBoards,
+);
+router.get(
+    "/boards/:id",
+    authMiddleware,
+    companyBoardMiddleware,
+    boardController.getById,
+);
+router.put(
+    "/boards/:id",
+    authMiddleware,
+    companyBoardMiddleware,
+    boardController.edit,
+);
+router.delete(
+    "/boards/:id",
+    authMiddleware,
+    companyBoardMiddleware,
+    boardController.delete,
+);
+router.post(
+    "/boards/:id/columns",
+    authMiddleware,
+    companyBoardMiddleware,
+    boardController.addColumn,
+);
+router.put(
+    "/boards/:id/columns/:columnId",
+    authMiddleware,
+    companyBoardMiddleware,
+    boardController.editColumn,
+);
+router.delete(
+    "/boards/:id/columns/:columnId",
+    authMiddleware,
+    companyBoardMiddleware,
+    boardController.deleteColumn,
+);
+router.put(
+    "/boards/:id/columns/:columnId/move",
+    authMiddleware,
+    companyBoardMiddleware,
+    boardController.moveColumn,
+);
+router.post(
+    "/boards/:id/columns/:columnId/tasks",
+    authMiddleware,
+    companyBoardMiddleware,
+    boardController.addTask,
+);
+router.get(
+    "/boards/:id/columns/:columnId/tasks/:taskId",
+    authMiddleware,
+    companyBoardMiddleware,
+    boardController.getTask,
+);
+router.put(
+    "/boards/:id/columns/:columnId/tasks/:taskId/move",
+    authMiddleware,
+    companyBoardMiddleware,
+    boardController.moveTask,
+);
+router.get(
+    "/boards/:id/members",
+    authMiddleware,
+    companyBoardMiddleware,
+    boardController.getMembers,
+);
+router.put(
+    "/boards/:id/columns/:columnId/tasks/:taskId",
+    authMiddleware,
+    companyBoardMiddleware,
+    boardController.editTask,
+);
 
 // media
 const storage = multer.diskStorage({

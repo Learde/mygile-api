@@ -17,52 +17,62 @@ class CompanyService {
         return company;
     }
 
-    async getAll(user, title) {
-        try {
-            const userId = user.id;
+async getAll(user, title) {
+    try {
+        const userId = user.id;
 
-            const userCompanies = await UserCompanyModel.find({
-                userId: userId,
-            });
+        const userCompanies = await UserCompanyModel.find({
+            userId: userId,
+        });
 
-            const companyIds = userCompanies.map(
-                (userCompany) => userCompany.companyId,
-            );
+        const companyIds = userCompanies.map(
+            (userCompany) => userCompany.companyId,
+        );
 
-            const matchStage = { _id: { $in: companyIds } };
-            if (title) {
-                matchStage.title = { $regex: title, $options: "i" };
-            }
-
-            const companiesWithMembersCount = await CompanyModel.aggregate([
-                { $match: matchStage },
-                {
-                    $lookup: {
-                        from: "usercompanies",
-                        localField: "_id",
-                        foreignField: "companyId",
-                        as: "members",
-                    },
-                },
-                {
-                    $addFields: {
-                        membersCount: { $size: "$members" },
-                    },
-                },
-                {
-                    $project: {
-                        members: 0,
-                    },
-                },
-            ]);
-
-            return companiesWithMembersCount;
-        } catch {
-            throw APIError.BadRequest(
-                "Ошибка при получении компаний пользователя",
-            );
+        const matchStage = { _id: { $in: companyIds } };
+        if (title) {
+            matchStage.title = { $regex: title, $options: "i" };
         }
+
+        const companiesWithCounts = await CompanyModel.aggregate([
+            { $match: matchStage },
+            {
+                $lookup: {
+                    from: "usercompanies",
+                    localField: "_id",
+                    foreignField: "companyId",
+                    as: "members",
+                },
+            },
+            {
+                $lookup: {
+                    from: "boards",
+                    localField: "_id",
+                    foreignField: "companyId",
+                    as: "boards",
+                },
+            },
+            {
+                $addFields: {
+                    membersCount: { $size: "$members" },
+                    boardsCount: { $size: "$boards" },
+                },
+            },
+            {
+                $project: {
+                    members: 0,
+                    boards: 0,
+                },
+            },
+        ]);
+
+        return companiesWithCounts;
+    } catch {
+        throw APIError.BadRequest(
+            "Ошибка при получении компаний пользователя",
+        );
     }
+}
 
     async getById(id, user) {
         const company = await CompanyModel.findById(id);

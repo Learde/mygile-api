@@ -1,5 +1,8 @@
 import { UserCompanyModel } from "../models/UserCompanyModel.js";
 import { BoardModel } from "../models/BoardModel.js";
+import { ColumnModel } from "../models/ColumnModel.js";
+import { TaskModel } from "../models/TaskModel.js";
+import { UserModel } from "../models/UserModel.js";
 import { APIError } from "../exceptions/APIError.js";
 
 class BoardService {
@@ -42,6 +45,25 @@ class BoardService {
         return board;
     }
 
+    async getMembers(id) {
+        const board = await BoardModel.findById(id);
+        const members = await UserCompanyModel.find({ companyId: board.companyId });
+
+        const users = await Promise.all(
+            members.map(async (member) => {
+                const user = await UserModel.findById(member.userId).select(
+                    "-password -activationLink",
+                );
+                return {
+                    role: member.role,
+                    user,
+                };
+            }),
+        );
+
+        return users;
+    }
+
     async getAll(companyId, user) {
         try {
             const userId = user.id;
@@ -59,14 +81,27 @@ class BoardService {
 
             return boards;
         } catch {
-            throw APIError.BadRequest(
-                "Ошибка при получении досок компании",
-            );
+            throw APIError.BadRequest("Ошибка при получении досок компании");
         }
     }
 
     async getById(id, userCompany, user) {
         const board = await BoardModel.findById(id);
+        const columns = (await ColumnModel.find({ boardId: id })).sort(
+            (a, b) => a.position - b.position,
+        );
+        const columnsWithTasks = await Promise.all(
+            columns.map(async (column) => {
+                const tasks = await TaskModel.find({
+                    columnId: column._id,
+                }).sort({ position: 1 });
+
+                return {
+                    ...column.toObject(),
+                    tasks,
+                };
+            }),
+        );
 
         return {
             _id: board._id,
@@ -74,6 +109,7 @@ class BoardService {
             type: board.type,
             userRole: userCompany.role,
             companyId: board.companyId,
+            columns: columnsWithTasks,
         };
     }
 

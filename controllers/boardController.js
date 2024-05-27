@@ -1,4 +1,6 @@
 import { boardService } from "../service/boardService.js";
+import { columnService } from "../service/columnService.js";
+import { taskService } from "../service/taskService.js";
 import { APIError } from "../exceptions/APIError.js";
 
 class BoardController {
@@ -20,6 +22,17 @@ class BoardController {
             const boards = await boardService.getAll(companyId, req.user);
 
             return res.json(boards);
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    async getMembers(req, res, next) {
+        try {
+            const { id } = req.params;
+            const members = await boardService.getMembers(id);
+
+            return res.json(members);
         } catch (e) {
             next(e);
         }
@@ -54,6 +67,98 @@ class BoardController {
             const board = await boardService.deleteById(id, req.userCompany, req.user);
 
             return res.json(board);
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    async addColumn(req, res, next) {
+        try {
+            const { id } = req.params;
+            const { title } = req.body;
+            const column = await columnService.add(title, id, req.userCompany);
+
+            return res.json(column);
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    async editColumn(req, res, next) {
+        try {
+            const { id, columnId } = req.params;
+            const { title } = req.body;
+            const column = await columnService.edit(title, columnId, id, req.userCompany);
+
+            return res.json(column);
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    async deleteColumn(req, res, next) {
+        try {
+            const { id, columnId } = req.params;
+            const column = await columnService.delete(columnId, req.userCompany);
+
+            return res.json(column);
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    async moveColumn(req, res, next) {
+        try {
+            const { columnId } = req.params;
+            const { position } = req.body;
+            const column = await columnService.moveColumn(columnId, position, req.userCompany);
+
+            return res.json(column);
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    async addTask(req, res, next) {
+        try {
+            const { columnId, id } = req.params;
+            const task = await taskService.add(req.body, columnId, id, req.user);
+
+            return res.json(task);
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    async getTask(req, res, next) {
+        try {
+            const { taskId } = req.params;
+            const task = await taskService.get(taskId);
+
+            return res.json(task);
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    async moveTask(req, res, next) {
+        try {
+            const { taskId, id, columnId } = req.params;
+            const { position } = req.body;
+            const task = await taskService.moveTask(taskId, position, columnId);
+
+            return res.json(task);
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    async editTask(req, res, next) {
+        try {
+            const { taskId } = req.params;
+            const task = await taskService.edit(req.body, taskId, req.userCompany, req.user);
+
+            return res.json(task);
         } catch (e) {
             next(e);
         }
