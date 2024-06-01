@@ -73,7 +73,6 @@ class ColumnService {
         const boardId = column.boardId;
 
         if (newPosition > currentPosition) {
-            // Сдвигаем колонки вниз
             await ColumnModel.updateMany(
                 {
                     boardId: boardId,
@@ -82,7 +81,6 @@ class ColumnService {
                 { $inc: { position: -1 } },
             );
         } else if (newPosition < currentPosition) {
-            // Сдвигаем колонки вверх
             await ColumnModel.updateMany(
                 {
                     boardId: boardId,
