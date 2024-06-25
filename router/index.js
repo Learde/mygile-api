@@ -159,8 +159,8 @@ router.put(
     companyBoardMiddleware,
     boardController.editTask,
 );
+router.post("/chat/:chatId/message", boardController.addMessage);
 
-// media
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, "media/");

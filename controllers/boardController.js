@@ -1,6 +1,7 @@
 import { boardService } from "../service/boardService.js";
 import { columnService } from "../service/columnService.js";
 import { taskService } from "../service/taskService.js";
+import { chatService } from "../service/chatService.js";
 import { APIError } from "../exceptions/APIError.js";
 
 class BoardController {
@@ -159,6 +160,18 @@ class BoardController {
             const task = await taskService.edit(req.body, taskId, req.userCompany, req.user);
 
             return res.json(task);
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    async addMessage(req, res, next) {
+        try {
+            const { chatId } = req.params;
+            const { text, authorId } = req.body;
+            const message = await chatService.addMessage({ chatId, text, authorId });
+
+            return res.json(message);
         } catch (e) {
             next(e);
         }
